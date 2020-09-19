@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Mastermind
 
 A game for dosbox based on the classic MASTERMIND board game.
@@ -9,3 +10,6 @@ After each guess, computer responds to indicate if the pattern is partially corr
 A green star shows that the digit matched with the pattern's at the corresponding place.
 
 A red stars shows that the digit at the coreponding place is wrong.
+=======
+# Mastermind
+>>>>>>> parent of 936c9af... Update README.md
