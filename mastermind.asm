@@ -20,6 +20,10 @@
     wlcm8 db "correct. A green star means that digit in that position is exactly    $"
     wlcm9 db "matching. Otherwise, it will give a red star for that position.       $"
 
+    end1 db "The pattern was: $"
+    end2 db "Thanks for playing. $"
+
+
     plen equ 4          ; length of pattern
     pattern db plen dup (00h)       ; to store generated pattern
     
@@ -52,7 +56,7 @@ print   PROC NEAR               ; procudure for printing string and changing lin
         push ax
         mov ah,09h
         int 21h
-        call line_change
+        
         
         pop ax
 
@@ -147,6 +151,7 @@ start:  mov ax,@data
 
 
 wlcm:   call print              ; prints the WELCOME message
+        call line_change
         add dx,m
         loop wlcm
         call line_change
@@ -174,6 +179,10 @@ attempt:
 
 read_input:     int 21h     
                 inc cx
+
+                cmp al,ESCAPE   ; if ESC pressed, end program
+                jz escexit
+
                 push ax
 
                 cmp bl,al
@@ -189,9 +198,29 @@ check:  pop dx          ; removing the stored ENTER KEY from the stack
 match:  lea si,pattern  ; address of 1st element of pattern
 
 
+
+escexit:        call line_change
+                lea dx,end1
+                call print      ; reveal the pattern to player
+                lea si,pattern
+                mov cx,plen
+                mov ah,02h
+
+        elp:    mov dl,[si]     ; print the generated pattern
+                int 21h
+                loop elp
+
+                call line_change
+                jmp exit        
+
         
 
-exit:   mov ah,4ch      ; setup to
+exit:   call line_change
+        mov ah,09h
+        lea dx,end2
+        int 21h
+        call line_change
+        mov ah,4ch      ; setup to
         int 21h         ; return to DOS
         end start
         
