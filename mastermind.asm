@@ -3,6 +3,7 @@
 .stack 256   
 
 .data
+    ESCAPE equ 1bh         ; ESCAPE key
     ENTER equ 0dh       ; ENTER key
     cr equ 0dh          ; carriage return
     lf equ 0ah          ; line feed
@@ -10,7 +11,7 @@
     n equ 09h
     m equ 47h
     wlcm1 db "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * $"
-    wlcm2 db "* * * * * * * * * * * * WELCOME TO MASTERMIND * * * * * * * * * * * * $"
+    wlcm2 db "* * * * * * * * * * * * * *MASTERMIND* * * *  * * * * * * * * * * * * $"
     wlcm3 db "                                                                      $"
     wlcm4 db "This game is based on the popular MASTERMIND board game.              $"
     wlcm5 db "The system will generate a 4-digit code. Player has to guess          $"
@@ -66,6 +67,7 @@ green_star      PROC NEAR
         push cx
         push dx
         
+        mov bh,00h      ; page number
         mov ah,09h
         mov al,star
         mov bl,green
@@ -93,6 +95,7 @@ red_star       PROC NEAR
         push cx
         push dx
 
+        mov bh,00h      ; page number
         mov ah,09h
         mov al,star
         mov bl,red
@@ -114,6 +117,27 @@ red_star       PROC NEAR
 red_star        ENDP
 
 
+rand    PROC NEAR       ; puts a random digit in dl
+
+        push ax
+        push cx
+
+        mov ah, 00h          
+        int 1ah            
+
+        mov  ax, dx
+        mov dx,0000h
+        mov  cx, 0ah    
+        div  cx       
+
+        add  dl, 30h 
+
+        pop cx
+        pop ax
+
+        ret
+rand    ENDP
+
 
 start:  mov ax,@data
         mov ds,ax
@@ -125,9 +149,20 @@ start:  mov ax,@data
 wlcm:   call print              ; prints the WELCOME message
         add dx,m
         loop wlcm
+        call line_change
 
-        mov cx,trials
+        mov cx,plen
+        lea si,pattern
 
+generate:       call rand
+                mov [si],dl
+                inc si
+
+                loop generate
+
+
+
+                mov cx,trials
 attempt:
 
 
@@ -154,6 +189,7 @@ check:  pop dx          ; removing the stored ENTER KEY from the stack
 match:  lea si,pattern  ; address of 1st element of pattern
 
 
+        
 
 exit:   mov ah,4ch      ; setup to
         int 21h         ; return to DOS
