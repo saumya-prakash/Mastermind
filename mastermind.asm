@@ -1,6 +1,6 @@
 .model large
 
-.stack 256   
+.stack 100   
 
 .data
     ESCAPE equ 1bh         ; ESCAPE key
@@ -20,14 +20,22 @@
     wlcm8 db "correct. A green star means that digit in that position is exactly    $"
     wlcm9 db "matching. Otherwise, it will give a red star for that position.       $"
 
+    atmpt db "Attempt No.: $"
+    
+    inv_len db "Please enter a pattern of length 4.$"
+    
+    win db "Congratulations!! You correctly guessed the code. $"
+
     end1 db "The pattern was: $"
     end2 db "Thanks for playing. $"
 
-
-    plen equ 4          ; length of pattern
+   
+    plen equ 04h          ; length of pattern
     pattern db plen dup (00h)       ; to store generated pattern
-    
-    trials equ 000ah       ; max attempts allowed
+    aux db plen dup (00h)       ; to store guessed pattern
+    result db plen dup (00h)    ; to store match/not match
+
+    trials dw 000ah       ; max attempts allowed
     
     star equ '*'
     green equ 02h
@@ -52,11 +60,10 @@ line_change     PROC NEAR            ; procedure to print 'newline' ('\n')
 line_change     ENDP
 
 
-print   PROC NEAR               ; procudure for printing string and changing line
+print   PROC NEAR               ; procudure for printing string
         push ax
         mov ah,09h
         int 21h
-        
         
         pop ax
 
@@ -162,41 +169,115 @@ wlcm:   call print              ; prints the WELCOME message
 generate:       call rand
                 mov [si],dl
                 inc si
-
                 loop generate
 
 
-
-                mov cx,trials
+                
 attempt:
-
-
-
         mov ah,01h
         mov cx,0000h
         mov bl,ENTER
+        lea si,aux
 
 
 read_input:     int 21h     
-                inc cx
+                inc cx          ; number of chars read
 
                 cmp al,ESCAPE   ; if ESC pressed, end program
-                jz escexit
+                jnz enter_chk   ; test inverted->prevents out of range error
+                jmp escexit
 
-                push ax
+        
+        enter_chk:      cmp bl,al
+                        jz check
 
-                cmp bl,al
-                jnz read_input
+        conti:  cmp cx,plen
+                jbe store
+                conti_back:     jmp read_input
 
-check:  pop dx          ; removing the stored ENTER KEY from the stack
+        store:  mov [si],al
+                inc si
+                jmp conti_back
+
+check:  
         dec cx
         cmp cx,plen
-        ;jnz invalid_length     ; length entered more or less than plen -> attempt doesn't count, clear the stack 
+        jnz invalid_length     ; length entered more or less than plen -> attempt doesn't count, clear the stack 
+        jmp match
+
+
+
+invalid_length: lea dx,inv_len
+                call print
+                call line_change
+                jmp attempt
+
 
 
 ; match and give appropriate output -> pattern guessed -> start exit process 
-match:  lea si,pattern  ; address of 1st element of pattern
+match:  mov cx,0000h
+        lea si,pattern
+        lea di,aux
+        push ds         ; ES made equal to DS
+        pop es
 
+comp1:  cmpsb
+        jz correct1
+        jnz wrong1
+
+comp2:  cmpsb
+        jz correct2
+        jnz wrong2
+
+comp3:  cmpsb
+        jz correct3
+        jnz wrong3
+
+comp4:  cmpsb
+        jz correct4
+        jnz wrong4
+
+
+
+correct1:       call green_star
+                inc cx
+                jmp comp2
+wrong1:         call red_star
+                jmp comp2
+
+correct2:       call green_star
+                inc cx
+                jmp comp3
+wrong2:         call red_star
+                jmp comp3
+
+correct3:       call green_star
+                inc cx
+                jmp comp4
+wrong3:         call red_star
+                jmp comp4
+
+correct4:       call green_star
+                inc cx
+                jmp all_match
+wrong4:         call red_star
+                jmp all_match
+
+        all_match:      call line_change
+                        cmp cx,0004h
+                        jz winner
+                        mov cx,trials
+                        dec cx
+                        cmp cx,0000h
+                        jz escexit      ; attempts exhausted
+                        mov trials,cx
+                        jmp attempt     ; more attempts left
+
+
+winner: lea dx,win
+        call print
+        call line_change
+        jmp exit
 
 
 escexit:        call line_change
