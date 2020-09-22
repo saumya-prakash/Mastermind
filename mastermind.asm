@@ -3,7 +3,7 @@
 .stack 100   
 
 .data
-    ESCAPE equ 1bh         ; ESCAPE key
+    ESCAPE equ 1bh      ; ESCAPE key
     ENTER equ 0dh       ; ENTER key
     cr equ 0dh          ; carriage return
     lf equ 0ah          ; line feed
@@ -20,7 +20,6 @@
     wlcm8 db "correct. A green star means that digit in that position is exactly    $"
     wlcm9 db "matching. Otherwise, it will give a red star for that position.       $"
 
-    atmpt db "Attempt No.: $"
     
     inv_len db "Please enter a pattern of length 4.$"
     
@@ -36,10 +35,15 @@
     result db plen dup (00h)    ; to store match/not match
 
     trials dw 000ah       ; max attempts allowed
+    atmpt db "Attempt No.: $"
+
+    at_no db "1$", "2$", "3$", "4$", "5$", "6$", "7$", "8$", "9$", "10$"    
     
     star equ '*'
     green equ 02h
     red equ 0ch
+
+
 
 .code
 
@@ -60,7 +64,7 @@ line_change     PROC NEAR            ; procedure to print 'newline' ('\n')
 line_change     ENDP
 
 
-print   PROC NEAR               ; procudure for printing string
+print   PROC NEAR               ; procudure to print string
         push ax
         mov ah,09h
         int 21h
@@ -71,7 +75,7 @@ print   PROC NEAR               ; procudure for printing string
 print   ENDP
 
 
-green_star      PROC NEAR
+green_star      PROC NEAR       ; procedure to print a 'green star'
 
         push ax
         push bx
@@ -99,7 +103,7 @@ green_star      PROC NEAR
         ret
 green_star      ENDP
 
-red_star       PROC NEAR
+red_star       PROC NEAR        ; procedure to print 'red star'
 
         push ax
         push bx
@@ -152,12 +156,16 @@ rand    ENDP
 
 start:  mov ax,@data
         mov ds,ax
+        mov es,ax         ; ES made equal to DS
+
+        lea si,at_no
+        push si         ; saving attempt number in stack
 
         mov cx,n
         lea dx,wlcm1
 
 
-wlcm:   call print              ; prints the WELCOME message
+wlcm:   call print              ; print WELCOME message
         call line_change
         add dx,m
         loop wlcm
@@ -166,14 +174,22 @@ wlcm:   call print              ; prints the WELCOME message
         mov cx,plen
         lea si,pattern
 
+                                ; generate a random pattern
 generate:       call rand
                 mov [si],dl
                 inc si
                 loop generate
 
 
-                
-attempt:
+                        ; start taking player attempts
+attempt:call line_change
+        lea dx,atmpt
+        call print
+        pop dx          ; get attempt number
+        call print      ; print attempt number
+        push dx         ; put it back in stack
+        call line_change
+
         mov ah,01h
         mov cx,0000h
         mov bl,ENTER
@@ -189,7 +205,7 @@ read_input:     int 21h
 
         
         enter_chk:      cmp bl,al
-                        jz check
+                        jz check        ; ENTER pressed->input over
 
         conti:  cmp cx,plen
                 jbe store
@@ -199,16 +215,15 @@ read_input:     int 21h
                 inc si
                 jmp conti_back
 
-check:  
-        dec cx
+check:  dec cx
         cmp cx,plen
-        jnz invalid_length     ; length entered more or less than plen -> attempt doesn't count, clear the stack 
+        jnz invalid_length     ; length of input more or less than plen -> attempt doesn't count 
         jmp match
 
 
 
-invalid_length: lea dx,inv_len
-                call print
+invalid_length: lea dx,inv_len 
+                call print      ; print INVALID_LENGTH message -> attempt doesn't count
                 call line_change
                 jmp attempt
 
@@ -218,8 +233,7 @@ invalid_length: lea dx,inv_len
 match:  mov cx,0000h
         lea si,pattern
         lea di,aux
-        push ds         ; ES made equal to DS
-        pop es
+        
 
 comp1:  cmpsb
         jz correct1
@@ -266,6 +280,12 @@ wrong4:         call red_star
         all_match:      call line_change
                         cmp cx,0004h
                         jz winner
+
+                        pop dx  ; get address of current attempt number
+                        inc dx  
+                        inc dx  ; move to next attempt number
+                        push dx ; save it in stack
+                        
                         mov cx,trials
                         dec cx
                         cmp cx,0000h
@@ -296,11 +316,11 @@ escexit:        call line_change
 
         
 
-exit:   call line_change
-        mov ah,09h
+exit:   call line_change        
         lea dx,end2
-        int 21h
+        call print      ; print THANK YOU
         call line_change
+        
         mov ah,4ch      ; setup to
         int 21h         ; return to DOS
         end start
