@@ -8,6 +8,8 @@
     cr equ 0dh          ; carriage return
     lf equ 0ah          ; line feed
 
+    seed dw 0000h           ; for random number-generator
+        
     n equ 09h
     m equ 47h
     wlcm1 db "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * $"
@@ -131,35 +133,40 @@ red_star       PROC NEAR        ; procedure to print 'red star'
         ret
 red_star        ENDP
 
-
-rand    PROC NEAR       ; puts a random digit in dl
-
+rand PROC NEAR
+        
         push ax
         push cx
-
-        mov ah, 00h          
-        int 1ah            
-
-        mov  ax, dx
+        
+        mov ax,seed
         mov dx,0000h
-        mov  cx, 0ah    
-        div  cx       
 
-        add  dl, 30h 
+        shr ax,1
+        shr ax,1
+        shr ax,1
+        shr ax,1
+        mov seed,ax
+
+        mov cx,000ah
+        div cx
+
+        add dl,30h
 
         pop cx
         pop ax
-
+        
         ret
-rand    ENDP
+rand ENDP
 
 
 start:  mov ax,@data
         mov ds,ax
         mov es,ax         ; ES made equal to DS
 
-        lea si,at_no
-        push si         ; saving attempt number in stack
+        mov ah,00h
+        int 1ah           
+
+        mov seed,dx
 
         mov cx,n
         lea dx,wlcm1
@@ -171,15 +178,18 @@ wlcm:   call print              ; print WELCOME message
         loop wlcm
         call line_change
 
+
         mov cx,plen
         lea si,pattern
-
                                 ; generate a random pattern
 generate:       call rand
                 mov [si],dl
                 inc si
                 loop generate
 
+
+        lea si,at_no
+        push si         ; saving attempt number in stack
 
                         ; start taking player attempts
 attempt:call line_change
@@ -208,12 +218,14 @@ read_input:     int 21h
                         jz check        ; ENTER pressed->input over
 
         conti:  cmp cx,plen
-                jbe store
+                js store
+                jz store
                 conti_back:     jmp read_input
 
         store:  mov [si],al
                 inc si
                 jmp conti_back
+
 
 check:  dec cx
         cmp cx,plen
@@ -303,12 +315,14 @@ winner: lea dx,win
 escexit:        call line_change
                 lea dx,end1
                 call print      ; reveal the pattern to player
+                
                 lea si,pattern
                 mov cx,plen
                 mov ah,02h
 
         elp:    mov dl,[si]     ; print the generated pattern
                 int 21h
+                inc si
                 loop elp
 
                 call line_change
