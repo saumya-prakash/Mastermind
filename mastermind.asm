@@ -1,4 +1,4 @@
-.model large
+.model small
 
 .stack 100   
 
@@ -10,10 +10,10 @@
 
     seed dw 0000h           ; for random number-generator
         
-    n equ 09h
+    n equ 0bh
     m equ 47h
     wlcm1 db "* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * $"
-    wlcm2 db "* * * * * * * * * * * * * *MASTERMIND* * * *  * * * * * * * * * * * * $"
+    wlcm2 db "* * * * * * * * * * * *    MASTERMIND    * *  * * * * * * * * * * * * $"
     wlcm3 db "                                                                      $"
     wlcm4 db "This game is based on the popular MASTERMIND board game.              $"
     wlcm5 db "The system will generate a 4-digit code. Player has to guess          $"
@@ -21,8 +21,9 @@
     wlcm7 db "the system will give hint indicating if the pattern entered is        $"
     wlcm8 db "correct. A green star means that digit in that position is exactly    $"
     wlcm9 db "matching. Otherwise, it will give a red star for that position.       $"
+    wlcm10 db "                                                                      $"
+    wlcm11 db "Press ESC to exit the game.                                           $"
 
-    
     inv_len db "Please enter a pattern of length 4.$"
     
     win db "Congratulations!! You correctly guessed the code. $"
@@ -141,7 +142,6 @@ rand PROC NEAR
         mov ax,seed
         mov dx,0000h
 
-        shr ax,1
         shr ax,1
         shr ax,1
         shr ax,1
