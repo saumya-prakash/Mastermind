@@ -11,7 +11,7 @@ For 32-bit and 64-bit versions, '-' is displayed in place of red star and '*' is
 
 
 <ul>
-  <li>For running the <b> mastermind_16-bit.asm </b> program, use DOSbox.
+  <li>For running the <b> mastermind_16-bit.asm </b> program, use DOSbox. Some utility DOSBox programs have been placed in thie repository.
 
     
   <li>For running the <b> mastermind_32-bit.asm </b> program (on a x86_84 machine),
