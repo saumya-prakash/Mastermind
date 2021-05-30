@@ -10,3 +10,14 @@ A green star shows that the digit matched with the pattern's at the correspondin
 
 A red stars shows that the digit at the coreponding place is wrong.
 
+
+<ul>
+  <li>For running the <b> mastermind.asm </b> program, use DOSbox.
+
+  <li>For running the <b> </b> program,
+
+```
+    $ nasm -f elf 
+
+
+```
