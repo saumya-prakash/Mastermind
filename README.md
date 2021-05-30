@@ -1,4 +1,4 @@
-## Mastermind Game in Assembly Language
+# Mastermind Game in Assembly Language
 
 This repository contains the assembly language (16-bit, 32-bit, 64-bit x86) implementation of the classic MASTERMIND board game.
 
