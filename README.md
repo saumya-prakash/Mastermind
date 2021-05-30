@@ -11,8 +11,13 @@ For 32-bit and 64-bit versions, '-' is displayed in place of red star and '*' is
 
 
 <ul>
-  <li>For running the <b> mastermind_16-bit.asm </b> program, use DOSbox. Some utility DOSBox programs have been placed in thie repository.
+  <li>For running the <b> mastermind_16-bit.asm </b> program, use <a href='https://www.dosbox.com/'> DOSbox </a>. Some utility DOSBox programs have been placed in thie repository. Put them in the directory where .asm files are placed.
 
+```
+> masm mastermind_16-bit.asm
+> link mastermind_16-bit.o
+> mastermind_16-bit.exe
+```
     
   <li>For running the <b> mastermind_32-bit.asm </b> program (on a x86_84 machine),
 
@@ -30,3 +35,5 @@ $ nasm -f elf64 mastermind_64-bit.asm
 $ ld mastermind_64-bit.o
 $ ./a.out
 ```
+
+</ul>
