@@ -14,7 +14,7 @@ For 32-bit and 64-bit versions, '-' is displayed in place of red star and '*' is
 
 
 
-* For running the **mastermind_16-bit.asm** program, use [DOSBox](https://www.dosbox.com/). Some utility DOSBox programs have been placed in ./DOSBox_utilities. Put them in the directory where .asm files are placed.
+* For running the **mastermind_16-bit.asm** program, use [DOSBox](https://www.dosbox.com/). The required DOSBox utility programs are in [DOSBox_utilities](./DOSBox_utilities). Put them in the directory where the .asm file is placed.
 
 ```
 $ masm mastermind_16-bit.asm
