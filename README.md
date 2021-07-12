@@ -15,29 +15,26 @@ For 32-bit and 64-bit versions, '-' is displayed in place of red star and '*' is
 
 
 * For running the **mastermind_16-bit.asm** program, use [DOSBox](https://www.dosbox.com/). The required DOSBox utility programs are in [DOSBox_utilities](./DOSBox_utilities). Put them in the directory where the .asm file is placed.
-
-```
-$ masm mastermind_16-bit.asm
-$ link mastermind_16-bit.o
-$ mastermind_16-bit.exe
-```
+    ```
+    $ masm mastermind_16-bit.asm
+    $ link mastermind_16-bit.o
+    $ mastermind_16-bit.exe
+    ```
     
 
 
 * For running the **mastermind_32-bit.asm** program (on a x86_84 machine),
-
-```
-$ nasm -f elf mastermind_32-bit.asm
-$ ld –m elf_i386 mastermind_32-bit.o 
-$ ./a.out
-```  
+    ```
+    $ nasm -f elf mastermind_32-bit.asm
+    $ ld –m elf_i386 mastermind_32-bit.o 
+    $ ./a.out
+    ```  
 
     
 * For running the **mastermind_64-bit.asm** program (on a x86_84 machine), 
-    
-```
-$ nasm -f elf64 mastermind_64-bit.asm
-$ ld mastermind_64-bit.o
-$ ./a.out
-```
+    ```
+    $ nasm -f elf64 mastermind_64-bit.asm
+    $ ld mastermind_64-bit.o
+    $ ./a.out
+    ```
 
