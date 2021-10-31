@@ -26,7 +26,7 @@ For 32-bit and 64-bit versions, '-' is displayed in place of red star and '*' is
     
 
 
-* For running the **mastermind_32-bit.asm** program (on a x86_84 machine),
+* For running the **mastermind_32-bit.asm** program (on a x86_64 machine),
     ```
     $ nasm -f elf mastermind_32-bit.asm
     $ ld –m elf_i386 mastermind_32-bit.o 
@@ -34,7 +34,7 @@ For 32-bit and 64-bit versions, '-' is displayed in place of red star and '*' is
     ```  
 
     
-* For running the **mastermind_64-bit.asm** program (on a x86_84 machine), 
+* For running the **mastermind_64-bit.asm** program (on a x86_64 machine), 
     ```
     $ nasm -f elf64 mastermind_64-bit.asm
     $ ld mastermind_64-bit.o
